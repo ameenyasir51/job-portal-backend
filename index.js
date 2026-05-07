@@ -21,15 +21,25 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Job Portal API running");
 });
+
 app.get("/api/jobs", async (req, res) => {
   try {
-    const jobs = await Job.find();
+    const { title, location } = req.query;
+    let query = {};
+    if (location) {
+      query.location = { $regex: location, $options: "i" }; 
+    }
+
+    if (title) {
+      query.title = { $regex: title, $options: "i" };
+    }
+
+    const jobs = await Job.find(query);
     res.json(jobs);
   } catch (err) {
     res.status(500).json({ message: "Error fetching data from database" });
   }
-}); 
-
+});
 app.post("/api/jobs", async (req, res) => {
   try {
     const newJob = new Job(req.body);
@@ -58,6 +68,6 @@ app.put("/api/jobs/:id", async (req, res) => {
     res.status(500).json({ message: "Error updating job" });
   }
 });
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+app.listen(5000, '0.0.0.0', () => {
+  console.log("Server is running on port 5000 and accessible to the network");
 });
