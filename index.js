@@ -6,16 +6,21 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to Shared MongoDB..."))
   .catch(err => console.error("Could not connect to Shared MongoDB...", err));
 const jobSchema = new mongoose.Schema({
-  title: String,
-  location: String,
-  salary: String,
-  company: String
+  title: { type: String, required: true },
+  location: { type: String, required: true },
+  salary: { type: String, required: true },
+  company: { type: String, required: true },
+  postedAt: { type: Date, default: Date.now }
 });
 
 const Job = mongoose.model("Job", jobSchema);
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "*", 
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 
 app.get("/", (req, res) => {
