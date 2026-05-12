@@ -89,6 +89,7 @@ app.get("/api/jobs/:id", async (req, res) => {
     try {
         const job = await Job.findById(req.params.id);
         if (!job) return res.status(404).json({ message: "Job not found" });
+        console.log("Found job data:", job);
         res.json(job);
     } catch (err) {
         res.status(500).json({ message: "Invalid ID format" });
@@ -116,6 +117,6 @@ app.delete("/api/applications/:id", async (req, res) => {
 });
 
 });
-app.listen(5000, '0.0.0.0', () => {
+app.listen(5000, () => {
   console.log("Server is running on port 5000 and accessible to the network");
 });
