@@ -85,6 +85,7 @@ app.put("/api/jobs/:id", async (req, res) => {
   }
 // --- MANAGEMENT ROUTES ---
 app.get("/api/jobs/:id", async (req, res) => {
+  console.log("Searching for Job ID:", req.params.id);
     try {
         const job = await Job.findById(req.params.id);
         if (!job) return res.status(404).json({ message: "Job not found" });
