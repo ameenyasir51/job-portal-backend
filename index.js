@@ -15,6 +15,17 @@ const jobSchema = new mongoose.Schema({
 
 const Job = mongoose.model("Job", jobSchema);
 
+const applicationSchema = new mongoose.Schema({
+  jobId: { type: mongoose.Schema.Types.ObjectId, ref: 'Job', required: true },
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  status: { type: String, default: "Pending" },
+  appliedAt: { type: Date, default: Date.now }
+});
+
+const Application = mongoose.model("Application", applicationSchema);
+
 const app = express();
 app.use(cors({
   origin: "*", 
@@ -72,6 +83,37 @@ app.put("/api/jobs/:id", async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Error updating job" });
   }
+// --- MANAGEMENT ROUTES ---
+app.get("/api/jobs/:id", async (req, res) => {
+    try {
+        const job = await Job.findById(req.params.id);
+        if (!job) return res.status(404).json({ message: "Job not found" });
+        res.json(job);
+    } catch (err) {
+        res.status(500).json({ message: "Invalid ID format" });
+    }
+});
+app.patch("/api/applications/:id", async (req, res) => {
+    try {
+        const updatedApp = await Application.findByIdAndUpdate(
+            req.params.id, 
+            { status: req.body.status }, 
+            { new: true }
+        );
+        res.json(updatedApp);
+    } catch (err) {
+        res.status(500).json({ message: "Error updating status" });
+    }
+});
+app.delete("/api/applications/:id", async (req, res) => {
+    try {
+        await Application.findByIdAndDelete(req.params.id);
+        res.json({ message: "Application deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: "Error deleting application" });
+    }
+});
+
 });
 app.listen(5000, '0.0.0.0', () => {
   console.log("Server is running on port 5000 and accessible to the network");
